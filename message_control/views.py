@@ -1,7 +1,24 @@
 from rest_framework.viewsets import ModelViewSet
 from .serializers import GenericFileUpload, GenericFileUploadSerializer, Message, MessageAttachment, MessageSerializer
-from rest_framework.permissions import IsAuthenticated
+from chatapi.custom_methods import IsAuthenticatedCustom
 from rest_framework.response import Response
+from django.db.models import Q
+from django.conf import settings
+import requests
+import json
+
+
+def handleRequest(serializer):
+    notification = {
+        "message": serializer.data.get("message"),
+        "from": serializer.data.get("sender"),
+        "receiver": serializer.data.get("receiver").get("id")
+    }
+    headers = {
+        "content-Type": "application/json",
+    }
+    requests.post(settings.SOCKET_SERVER, json.dumps(notification), headers=headers)
+    return True
 
 
 class GenericFileUploadView(ModelViewSet):
@@ -13,7 +30,17 @@ class MessageView(ModelViewSet):
     queryset = Message.objects.select_related("sender", "receiver")\
         .prefetch_related("message_attachments")
     serializer_class = MessageSerializer
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticatedCustom, )
+
+    def get_queryset(self):
+        data = self.request.query_params.dict()
+        user_id = data.get("user_id", None)
+
+        if user_id:
+            active_user_id = self.request.user.id
+            return self.queryset.filter(Q(sender_id=user_id, receiver_id=active_user_id) |
+                                        Q(sender_id=active_user_id, receiver_id=user_id)).distinct()
+        return self.queryset
 
     def create(self, request, *args, **kwargs):
         if hasattr(request.data, '_mutable'):
@@ -32,6 +59,8 @@ class MessageView(ModelViewSet):
                 **attachment, message_id=serializer.data["id"]) for attachment in attachments])
             message_data = self.get_queryset().get(id=serializer.data["id"])
             return Response(self.serializer_class(message_data).data, status=201)
+
+        handleRequest(serializer)
 
         return Response(serializer.data, status=201)
 
@@ -53,5 +82,7 @@ class MessageView(ModelViewSet):
                 **attachment, message_id=serializer.data["id"]) for attachment in attachments])
             message_data = self.get_object()
             return Response(self.serializer_class(message_data).data, status=201)
+
+        handleRequest(serializer)
 
         return Response(serializer.data, status=201)

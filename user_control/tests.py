@@ -185,14 +185,15 @@ class TestUserInfo(APITestCase):
 
         url = self.profile_url + '?keyword=Name tatiana'
         response = self.client.get(url)
-        result = response.json()
+        result = response.json()["results"]
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0]["user"]["username"], "tanya-kta")
+        self.assertEqual(result[0]["message_count"], 0)
 
         url = self.profile_url + '?keyword=tester'
         response = self.client.get(url)
-        result = response.json()
+        result = response.json()["results"]
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(result), 2)
         self.assertEqual(result[1]["user"]["username"], "tester2")
