@@ -12,6 +12,8 @@ from rest_framework.response import Response
 from .authentication import Authentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
+import re
+from django.db.models import Q, Count, Subquery, OuterRef
 
 
 def get_random(length):
@@ -98,3 +100,38 @@ class UserProfileView(ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
     permission_classes = (IsAuthenticated, )
+
+    def get_queryset(self):
+        data = self.request.query_params.dict()
+        keyword = data.pop("keyword", None)
+
+        if keyword:
+            search_fields = (
+                "user__username", "first_name", "last_name"
+            )
+            query = self.get_query(keyword, search_fields)
+            return self.queryset.filter(query).distinct()
+        return self.queryset
+
+    @staticmethod
+    def get_query(query_string, search_fields):
+        query = None
+        terms = UserProfileView.normalize_query(query_string)
+        for term in terms:
+            or_query = None
+            for field_name in search_fields:
+                q = Q(**{"%s__icontains" % field_name: term})
+                if or_query is None:
+                    or_query = q
+                else:
+                    or_query = or_query | q
+            if query is None:
+                query = or_query
+            else:
+                query = query & or_query
+        return query
+
+    @staticmethod
+    def normalize_query(query_string, findterms=re.compile(r'"([^"]+)"|(\S+)').findall,
+                        normspace=re.compile(r'\s{2,}').sub):
+        return [normspace(' ', (t[0] or t[1]).strip()) for t in findterms(query_string)]
