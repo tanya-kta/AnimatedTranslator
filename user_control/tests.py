@@ -35,6 +35,7 @@ class TestAuth(APITestCase):
     def test_register(self):
         payload = {
             "username": "tanya-kta",
+            "email": "takadykova@edu.hse.ru",
             "password": "tanya9911"
         }
 
@@ -44,6 +45,7 @@ class TestAuth(APITestCase):
     def test_login(self):
         payload = {
             "username": "tanya-kta",
+            "email": "takadykova@edu.hse.ru",
             "password": "tanya9911"
         }
 
@@ -58,6 +60,7 @@ class TestAuth(APITestCase):
     def test_refresh(self):
         payload = {
             "username": "tanya-kta",
+            "email": "takadykova@edu.hse.ru",
             "password": "tanya9911"
         }
 
@@ -83,6 +86,7 @@ class TestUserInfo(APITestCase):
     def setUp(self) -> None:
         payload = {
             "username": "tanya-kta",
+            "email": "takadykova@edu.hse.ru",
             "password": "tanya9911"
         }
         self.user = CustomUser.objects._create_user(**payload)
@@ -170,6 +174,7 @@ class TestUserInfo(APITestCase):
         UserProfile.objects.create(**payload1)
         payload2 = {
             "username": "tester1",
+            "email": "tanya-kta@bk.ru",
             "password": "tester19911"
         }
         user2 = CustomUser.objects._create_user(**payload2)
@@ -177,6 +182,7 @@ class TestUserInfo(APITestCase):
                                    caption="Testing", about="Tester1")
         payload3 = {
             "username": "tester2",
+            "email": "ricopin@bk.ru",
             "password": "tester29911"
         }
         user3 = CustomUser.objects._create_user(**payload3)
