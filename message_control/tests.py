@@ -43,12 +43,12 @@ class TestMessage(APITestCase):
         self.sender = CustomUser.objects._create_user(
             "sender", "sender123", email="takadykova@edu.hse.ru")
         UserProfile.objects.create(
-            first_name="sender", last_name="sender", user=self.sender, caption="sender", about="sender")
+            first_name="sender", last_name="sender", user=self.sender, language="russian")
 
         self.receiver = CustomUser.objects._create_user(
             "receiver", "receiver123", email="tanya-kta@bk.ru")
         UserProfile.objects.create(
-            first_name="receiver", last_name="receiver", user=self.receiver, caption="receiver", about="receiver")
+            first_name="receiver", last_name="receiver", user=self.receiver, language="russian")
 
         self.client.force_authenticate(user=self.sender)
 
@@ -109,7 +109,6 @@ class TestMessage(APITestCase):
             "sender_id": self.sender.id,
             "receiver_id": self.receiver.id,
             "message": "test message",
-
         }
         self.client.post(self.message_url, data=payload)
 
@@ -130,7 +129,6 @@ class TestMessage(APITestCase):
             "sender_id": self.sender.id,
             "receiver_id": self.receiver.id,
             "message": "test message",
-
         }
         self.client.post(self.message_url, data=payload)
 

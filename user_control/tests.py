@@ -97,8 +97,7 @@ class TestUserInfo(APITestCase):
             "user_id": self.user.id,
             "first_name": "Tatiana",
             "last_name": "Kadykova",
-            "caption": "The coolest caption",
-            "about": "I am doing an important uni project"
+            "language": "russian"
         }
 
         response = self.client.post(
@@ -123,8 +122,7 @@ class TestUserInfo(APITestCase):
             "user_id": self.user.id,
             "first_name": "Tatiana",
             "last_name": "Kadykova",
-            "caption": "The coolest caption",
-            "about": "I am doing an important uni project",
+            "language": "russian",
             "profile_picture_id": result["id"]
         }
 
@@ -141,8 +139,7 @@ class TestUserInfo(APITestCase):
             "user_id": self.user.id,
             "first_name": "Tatiana",
             "last_name": "Kadykova",
-            "caption": "The coolest caption",
-            "about": "I am doing an important uni project"
+            "language": "russian"
         }
 
         response = self.client.post(
@@ -168,8 +165,7 @@ class TestUserInfo(APITestCase):
             "user": self.user,
             "first_name": "Tatiana",
             "last_name": "Name",
-            "caption": "The coolest caption",
-            "about": "I am doing an important uni project"
+            "language": "russian"
         }
         UserProfile.objects.create(**payload1)
         payload2 = {
@@ -179,7 +175,7 @@ class TestUserInfo(APITestCase):
         }
         user2 = CustomUser.objects._create_user(**payload2)
         UserProfile.objects.create(user=user2, first_name="Tester1", last_name="LastTester1",
-                                   caption="Testing", about="Tester1")
+                                   language="russian")
         payload3 = {
             "username": "tester2",
             "email": "ricopin@bk.ru",
@@ -187,7 +183,7 @@ class TestUserInfo(APITestCase):
         }
         user3 = CustomUser.objects._create_user(**payload3)
         UserProfile.objects.create(user=user3, first_name="Tester2", last_name="LastTester2",
-                                   caption="Testing", about="Tester2")
+                                   language="russian")
 
         url = self.profile_url + '?keyword=Name tatiana'
         response = self.client.get(url)
