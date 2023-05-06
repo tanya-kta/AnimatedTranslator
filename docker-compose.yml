@@ -8,14 +8,10 @@ services:
     restart: unless-stopped
     volumes:
       - .:/AnimatedTranslator
-      - etc-letsencrypt:/etc/letsencrypt
     ports:
       - "8000:8000"
     networks:
       - postgres
-
-volumes:
-  etc-letsencrypt:
 
 networks:
   postgres:
