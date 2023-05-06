@@ -4,6 +4,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from six import BytesIO
 from PIL import Image
 import json
+from chatapi.custom_methods import translate_text
 
 
 def create_image(storage, filename, size=(100, 100), image_mode='RGB', image_format='PNG'):
@@ -34,6 +35,7 @@ class TestFileUpload(APITestCase):
 
 
 class TestMessage(APITestCase):
+    profile_url = "/user/profile"
     message_url = "/message/message"
     file_upload_url = "/message/file-upload"
 
