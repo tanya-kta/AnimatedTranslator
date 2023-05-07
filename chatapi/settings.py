@@ -165,3 +165,5 @@ CLOUDINARY_STORAGE = {
 SOCKET_SERVER = config("SOCKET_SERVER")
 
 IAM_TOKEN = config("IAM_TOKEN")
+
+CSRF_TRUSTED_ORIGINS = ['https://animachat.ru/']
