@@ -135,3 +135,32 @@ class UserProfileView(ModelViewSet):
     def normalize_query(query_string, findterms=re.compile(r'"([^"]+)"|(\S+)').findall,
                         normspace=re.compile(r'\s{2,}').sub):
         return [normspace(' ', (t[0] or t[1]).strip()) for t in findterms(query_string)]
+
+
+class MeView(APIView):
+    permission_classes = (IsAuthenticatedCustom, )
+    serializer_class = UserProfileSerializer
+
+    def get(self, request):
+        data = {}
+        try:
+            data = self.serializer_class(request.user.user_profile).data
+        except Exception:
+            data = {
+                "user": {
+                    "id": request.user.id
+                }
+            }
+        return Response(data, status=200)
+
+
+class LogoutView(APIView):
+    permission_classes = (IsAuthenticatedCustom, )
+
+    def get(self, request):
+        user_id = request.user.id
+
+        JwtModel.objects.filter(user_id=user_id).delete()
+
+        return Response("logged out successfully", status=200)
+    

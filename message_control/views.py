@@ -1,4 +1,5 @@
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.views import APIView
 from .serializers import GenericFileUpload, GenericFileUploadSerializer, Message, MessageAttachment, MessageSerializer
 from chatapi.custom_methods import IsAuthenticatedCustom
 from rest_framework.response import Response
@@ -89,3 +90,11 @@ class MessageView(ModelViewSet):
         handleRequest(serializer)
 
         return Response(serializer.data, status=201)
+
+
+class ReadMultipleMessages(APIView):
+    def post(self, request):
+        data = request.data.get("message_ids", None)
+
+        Message.objects.filter(id__in=data).update(is_read=True)
+        return Response("success")
