@@ -168,8 +168,8 @@ IAM_TOKEN = config("IAM_TOKEN")
 
 CSRF_TRUSTED_ORIGINS = ['https://animachat.ru/']
 
-CSRF_TRUSTED_ORIGINS = ['https://animachat.ru/']
-
 CORS_REPLACE_HTTPS_REFERER = True
 
 CSRF_COOKIE_DOMAIN = 'animachat.ru'
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
