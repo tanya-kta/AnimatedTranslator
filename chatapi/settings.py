@@ -173,8 +173,3 @@ CSRF_TRUSTED_ORIGINS = ['https://animachat.ru/']
 CORS_REPLACE_HTTPS_REFERER = True
 
 CSRF_COOKIE_DOMAIN = 'animachat.ru'
-
-CORS_ORIGIN_WHITELIST = (
-    'https://animachat.ru/',
-    'animachat.ru',
-)
