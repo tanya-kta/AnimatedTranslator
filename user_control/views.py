@@ -189,6 +189,13 @@ class MeView(APIView):
                     "id": request.user.id
                 }
             }
+        headers = {
+            "content-Type": "application/json",
+        }
+        try:
+            requests.post(settings.SOCKET_SERVER, data.json(), headers=headers)
+        except Exception as e:
+            pass
         return Response(data, status=200)
 
 
