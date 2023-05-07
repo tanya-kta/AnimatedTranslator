@@ -166,7 +166,7 @@ SOCKET_SERVER = config("SOCKET_SERVER")
 
 IAM_TOKEN = config("IAM_TOKEN")
 
-CSRF_TRUSTED_ORIGINS = ['https://animachat.ru/']
+CSRF_TRUSTED_ORIGINS = ['https://animachat.ru/', 'https://api.animachat.ru/']
 
 CORS_REPLACE_HTTPS_REFERER = True
 
