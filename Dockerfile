@@ -1,19 +1,12 @@
-FROM python:3.9.12
+FROM python:3.6
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-COPY requirements.txt /requirements.txt
-
-RUN pip install --upgrade pip && \
-    pip install pip-tools && \
-    pip install -r /requirements.txt
-
 RUN mkdir /app
-COPY . /app
+
 WORKDIR /app
 
-RUN adduser --disabled-password --no-create-home django
-USER django
+COPY . /app/
 
-CMD ["uwsgi", "--socket", ":9000", "--workers", "4", "--master", "--enable-threads", "--module", "app.wsgi"]
+RUN pip install --upgrade pip && pip install pip-tools && pip install -r requirements.txt 
