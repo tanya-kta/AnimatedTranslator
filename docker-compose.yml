@@ -1,17 +1,14 @@
-version: "3"
+version: "3.9"
 
 services:
-  web:
-    build: .
+  app:
+    build: 
+      context: .
     command: bash -c "python manage.py runserver 0.0.0.0:8000"
-    container_name: AnimatedTranslator
-    restart: unless-stopped
     volumes:
-      - .:/AnimatedTranslator
+      - ./app:/app
     ports:
       - "8000:8000"
-    networks:
-      - postgres
 
 networks:
   postgres:
