@@ -23,7 +23,7 @@ class Message(models.Model):
         return f"message between {self.sender.username} and {self.receiver.username}"
 
     class Meta:
-        ordering = ("created_at",)
+        ordering = ("-created_at",)
 
 
 class MessageAttachment(models.Model):
@@ -35,4 +35,4 @@ class MessageAttachment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ("created_at",)
+        ordering = ("-created_at",)
