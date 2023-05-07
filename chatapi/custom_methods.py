@@ -9,6 +9,11 @@ import requests
 
 class IsAuthenticatedCustom(BasePermission):
     def has_permission(self, request, view):
+        from user_control.views import decodeJWT
+        user = decodeJWT(request.META['HTTP_AUTHORIZATION'])
+        if not user:
+            return False
+        request.user = user
         if request.user and request.user.is_authenticated:
             from user_control.models import CustomUser
             CustomUser.objects.filter(id=request.user.id).update(

@@ -54,7 +54,7 @@ class UserProfile(models.Model):
         CustomUser, related_name="user_profile", on_delete=models.CASCADE)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    language = models.CharField(max_length=100)
+    language = models.CharField(max_length=100, blank=True)
     caption = models.CharField(max_length=250, blank=True)
     about = models.TextField(blank=True)
     profile_picture = models.ForeignKey(

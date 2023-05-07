@@ -36,6 +36,19 @@ def get_refresh_token():
     )
 
 
+def decodeJWT(bearer):
+    if not bearer:
+        return None
+
+    token = bearer[7:]
+    decoded = jwt.decode(token, key=settings.SECRET_KEY, algorithms=["HS256"])
+    if decoded:
+        try:
+            return CustomUser.objects.get(id=decoded["user_id"])
+        except Exception:
+            return None
+
+
 class LoginView(APIView):
     serializer_class = LoginSerializer
 

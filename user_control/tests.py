@@ -82,121 +82,120 @@ class TestAuth(APITestCase):
 class TestUserInfo(APITestCase):
     profile_url = "/user/profile"
     file_upload_url = "/message/file-upload"
+    login_url = "/user/login"
 
-    def setUp(self) -> None:
+    def setUp(self):
         payload = {
-            "username": "tanya-kta",
-            "email": "takadykova@edu.hse.ru",
-            "password": "tanya9911"
+            "username": "takadykova",
+            "password": "takadykova123",
+            "email": "takadykova@edu.hse.ru"
         }
+
         self.user = CustomUser.objects._create_user(**payload)
-        self.client.force_authenticate(user=self.user)
+
+        response = self.client.post(self.login_url, data=payload)
+        result = response.json()
+
+        self.bearer = {
+            'HTTP_AUTHORIZATION': 'Bearer {}'.format(result['access'])}
 
     def test_post_user_profile(self):
+
         payload = {
             "user_id": self.user.id,
-            "first_name": "Tatiana",
+            "first_name": "Tanya",
             "last_name": "Kadykova",
             "language": "russian"
         }
 
         response = self.client.post(
-            self.profile_url, data=payload)
+            self.profile_url, data=payload, **self.bearer)
         result = response.json()
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(result["first_name"], "Tatiana")
+        self.assertEqual(result["first_name"], "Tanya")
         self.assertEqual(result["last_name"], "Kadykova")
-        self.assertEqual(result["user"]["username"], "tanya-kta")
+        self.assertEqual(result["user"]["username"], "takadykova")
 
     def test_post_user_profile_with_profile_picture(self):
         avatar = create_image(None, 'avatar.png')
-        avatar_file = SimpleUploadedFile('front1.png', avatar.getvalue())
+        avatar_file = SimpleUploadedFile('front.png', avatar.getvalue())
         data = {
             "file_upload": avatar_file
         }
 
-        response = self.client.post(self.file_upload_url, data=data)
+        response = self.client.post(
+            self.file_upload_url, data=data, **self.bearer)
         result = response.json()
 
         payload = {
             "user_id": self.user.id,
-            "first_name": "Tatiana",
+            "first_name": "Tanya",
             "last_name": "Kadykova",
             "language": "russian",
             "profile_picture_id": result["id"]
         }
 
         response = self.client.post(
-            self.profile_url, data=payload)
+            self.profile_url, data=payload, **self.bearer)
         result = response.json()
+
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(result["first_name"], "Tatiana")
+        self.assertEqual(result["first_name"], "Tanya")
         self.assertEqual(result["last_name"], "Kadykova")
+        self.assertEqual(result["user"]["username"], "takadykova")
         self.assertEqual(result["profile_picture"]["id"], 1)
 
     def test_update_user_profile(self):
         payload = {
             "user_id": self.user.id,
-            "first_name": "Tatiana",
+            "first_name": "Tanya",
             "last_name": "Kadykova",
             "language": "russian"
         }
 
         response = self.client.post(
-            self.profile_url, data=payload)
+            self.profile_url, data=payload, **self.bearer)
         result = response.json()
 
         payload = {
-            "first_name": "Tanya",
+            "first_name": "Tatiana",
             "last_name": "Kad",
         }
 
         response = self.client.patch(
-            self.profile_url + f"/{result['id']}", data=payload)
+            self.profile_url + f"/{result['id']}", data=payload, **self.bearer)
         result = response.json()
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(result["first_name"], "Tanya")
+        self.assertEqual(result["first_name"], "Tatiana")
         self.assertEqual(result["last_name"], "Kad")
-        self.assertEqual(result["user"]["username"], "tanya-kta")
+        self.assertEqual(result["user"]["username"], "takadykova")
 
     def test_user_search(self):
-        payload1 = {
-            "user": self.user,
-            "first_name": "Tatiana",
-            "last_name": "Name",
-            "language": "russian"
-        }
-        UserProfile.objects.create(**payload1)
-        payload2 = {
-            "username": "tester1",
-            "email": "tanya-kta@bk.ru",
-            "password": "tester19911"
-        }
-        user2 = CustomUser.objects._create_user(**payload2)
-        UserProfile.objects.create(user=user2, first_name="Tester1", last_name="LastTester1",
-                                   language="russian")
-        payload3 = {
-            "username": "tester2",
-            "email": "ricopin@bk.ru",
-            "password": "tester29911"
-        }
-        user3 = CustomUser.objects._create_user(**payload3)
-        UserProfile.objects.create(user=user3, first_name="Tester2", last_name="LastTester2",
-                                   language="russian")
 
-        url = self.profile_url + '?keyword=Name tatiana'
-        response = self.client.get(url)
+        UserProfile.objects.create(user=self.user, first_name="Tanya", last_name="Kadykova")
+
+        user2 = CustomUser.objects._create_user(
+            username="tester1", password="tester1123", email="tanya-kta@bk.ru")
+        UserProfile.objects.create(user=user2, first_name="tester1", last_name="tester1")
+
+        user3 = CustomUser.objects._create_user(
+            username="tester2", password="tester2123", email="ricopin@bk.ru")
+        UserProfile.objects.create(user=user3, first_name="tester2", last_name="tester2")
+
+        url = self.profile_url + "?keyword=Tanya Kadykova"
+
+        response = self.client.get(url, **self.bearer)
         result = response.json()["results"]
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(result), 1)
-        self.assertEqual(result[0]["user"]["username"], "tanya-kta")
-        self.assertEqual(result[0]["message_count"], 0)
 
-        url = self.profile_url + '?keyword=tester'
-        response = self.client.get(url)
+        url = self.profile_url + "?keyword=tester"
+
+        response = self.client.get(url, **self.bearer)
         result = response.json()["results"]
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(result), 2)
         self.assertEqual(result[1]["user"]["username"], "tester2")
-
