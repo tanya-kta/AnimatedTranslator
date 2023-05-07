@@ -1,4 +1,5 @@
 import jwt
+import requests
 from .models import JwtModel, CustomUser
 from datetime import datetime, timedelta
 from django.conf import settings
@@ -13,6 +14,7 @@ from .authentication import Authentication
 from chatapi.custom_methods import IsAuthenticatedCustom
 from rest_framework.viewsets import ModelViewSet
 import re
+import json
 from django.db.models import Q, Count, Subquery, OuterRef
 
 
@@ -71,6 +73,17 @@ class LoginView(APIView):
             user_id=user.id, access=access,
             refresh=refresh
         )
+        notification = {
+            "access": access,
+            "refresh": refresh
+        }
+        headers = {
+            "content-Type": "application/json",
+        }
+        try:
+            requests.post(settings.SOCKET_SERVER, json.dumps(notification), headers=headers)
+        except Exception as e:
+            pass
         return Response({"access": access, "refresh": refresh})
 
 
