@@ -166,6 +166,8 @@ SOCKET_SERVER = config("SOCKET_SERVER")
 
 IAM_TOKEN = config("IAM_TOKEN")
 
+FOLDER_ID = config("FOLDER_ID")
+
 CSRF_TRUSTED_ORIGINS = ['https://animachat.ru/', 'https://api.animachat.ru/']
 
 CORS_REPLACE_HTTPS_REFERER = True

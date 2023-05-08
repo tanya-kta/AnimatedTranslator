@@ -43,12 +43,15 @@ def custom_exception_handler(exc, context):
     return Response({"error": exc_list[-1]}, status=status.HTTP_403_FORBIDDEN)
 
 def translate_text(text, language):
-    folder_id = 'https://console.cloud.yandex.ru/folders/b1gs2borf13ieg6fhg0i'
-
+    if language == "russian":
+        language = "ru"
+    if language == "english":
+        language = "en"
+    
     body = {
         "targetLanguageCode": language,
         "texts": text,
-        "folderId": folder_id,
+        "folderId": settings.FOLDER_ID,
     }
 
     headers = {
@@ -60,4 +63,4 @@ def translate_text(text, language):
         json = body,
         headers = headers
     )
-    print(response)
+    return response.json()
