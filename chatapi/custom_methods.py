@@ -47,7 +47,7 @@ def translate_text(text, language):
         language = "ru"
     if language == "english":
         language = "en"
-    
+
     body = {
         "targetLanguageCode": language,
         "texts": text,
@@ -63,4 +63,4 @@ def translate_text(text, language):
         json = body,
         headers = headers
     )
-    return response.json()
+    return response.json()["translations"][0]["text"]

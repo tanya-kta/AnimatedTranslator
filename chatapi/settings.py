@@ -13,6 +13,7 @@ import os.path
 from pathlib import Path
 from decouple import config
 import paralleldots
+import json
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -165,7 +166,10 @@ CLOUDINARY_STORAGE = {
 
 SOCKET_SERVER = config("SOCKET_SERVER")
 
-IAM_TOKEN = config("IAM_TOKEN")
+OAUTH_TOKEN = config("OAUTH_TOKEN")
+
+PATH_YA = 'curl -d "{\\"yandexPassportOauthToken\\":\\"' + OAUTH_TOKEN + '\\"}" https://iam.api.cloud.yandex.net/iam/v1/tokens'
+IAM_TOKEN = json.loads(os.popen(PATH_YA).read())['iamToken']
 
 FOLDER_ID = config("FOLDER_ID")
 

@@ -87,7 +87,7 @@ class MessageView(ModelViewSet):
         serializer.save()
         
         if request.data["message"][0:4] != "http":
-            request.data["message"] = getEmotionGif(request.data["message"])
+            request.data["message"] = getEmotionGif(translate_text(request.data["message"], "english"))
             serializer2 = self.serializer_class(data=request.data)
             serializer2.is_valid(raise_exception=True)
             serializer2.save()
