@@ -67,13 +67,13 @@ class MessageView(ModelViewSet):
             raise Exception("Only sender can create a message")
 
         #print(request.data)
-        request.data['message'] = "https://res.cloudinary.com/dhip0v8jx/image/upload/v1683574428/pug-dance_l55nty.gif"
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        #serializer2 = self.serializer_class(data=request.data)
-        #serializer2.is_valid(raise_exception=True)
-        #serializer2.save()
+        request.data['message'] = "https://res.cloudinary.com/dhip0v8jx/image/upload/v1683574428/pug-dance_l55nty.gif"
+        serializer2 = self.serializer_class(data=request.data)
+        serializer2.is_valid(raise_exception=True)
+        serializer2.save()
 
         return Response(serializer.data, status=201)
 
