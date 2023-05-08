@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from .serializers import GenericFileUpload, GenericFileUploadSerializer, Message, MessageAttachment, MessageSerializer
-from chatapi.custom_methods import IsAuthenticatedCustom
+from chatapi.custom_methods import IsAuthenticatedCustom, translate_text
 from rest_framework.response import Response
 from django.db.models import Q
 from django.conf import settings
@@ -37,13 +37,24 @@ class MessageView(ModelViewSet):
     permission_classes = (IsAuthenticatedCustom, )
 
     def get_queryset(self):
+        #from user_control.models import UserProfile, CustomUser
         data = self.request.query_params.dict()
         user_id = data.get("user_id", None)
 
         if user_id:
             active_user_id = self.request.user.id
-            return self.queryset.filter(Q(sender_id=user_id, receiver_id=active_user_id) |
-                                        Q(sender_id=active_user_id, receiver_id=user_id)).distinct()
+            #user = CustomUser.objects.filter(id=user_id).distinct()[0]
+            #language = UserProfile.objects.filter(user=user).distinct()[0].language
+            #print(language)
+            translated_query = self.queryset.filter(
+                Q(sender_id=user_id, receiver_id=active_user_id) |
+                Q(sender_id=active_user_id, receiver_id=user_id)).distinct()
+            #translated_query[0].message = translate_text(translated_query[0].message, language)["translations"][0]["text"]
+            #print(translated_query[0] == self.queryset.filter(
+            #    Q(sender_id=user_id, receiver_id=active_user_id) |
+            #    Q(sender_id=active_user_id, receiver_id=user_id)).distinct()[0])
+               
+            return translated_query
         return self.queryset
 
     def create(self, request, *args, **kwargs):
@@ -54,17 +65,14 @@ class MessageView(ModelViewSet):
         if str(request.user.id) != str(request.data.get("sender_id", None)):
             raise Exception("Only sender can create a message")
 
+        #print(request.data)
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-
-        if attachments:
-            MessageAttachment.objects.bulk_create([MessageAttachment(
-                **attachment, message_id=serializer.data["id"]) for attachment in attachments])
-            message_data = self.get_queryset().get(id=serializer.data["id"])
-            return Response(self.serializer_class(message_data).data, status=201)
-
-        handleRequest(serializer)
+        request.data['message'] = "https://res.cloudinary.com/dhip0v8jx/image/upload/v1683574428/pug-dance_l55nty.gif"
+        serializer2 = self.serializer_class(data=request.data)
+        serializer2.is_valid(raise_exception=True)
+        serializer2.save()
 
         return Response(serializer.data, status=201)
 
