@@ -49,6 +49,7 @@ class MessageView(ModelViewSet):
             translated_query = self.queryset.filter(
                 Q(sender_id=user_id, receiver_id=active_user_id) |
                 Q(sender_id=active_user_id, receiver_id=user_id)).distinct()
+            #print(translated_query)
             #translated_query[0].message = translate_text(translated_query[0].message, language)["translations"][0]["text"]
             #print(translated_query[0] == self.queryset.filter(
             #    Q(sender_id=user_id, receiver_id=active_user_id) |
@@ -66,13 +67,13 @@ class MessageView(ModelViewSet):
             raise Exception("Only sender can create a message")
 
         #print(request.data)
+        request.data['message'] = "https://res.cloudinary.com/dhip0v8jx/image/upload/v1683574428/pug-dance_l55nty.gif"
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        request.data['message'] = "https://res.cloudinary.com/dhip0v8jx/image/upload/v1683574428/pug-dance_l55nty.gif"
-        serializer2 = self.serializer_class(data=request.data)
-        serializer2.is_valid(raise_exception=True)
-        serializer2.save()
+        #serializer2 = self.serializer_class(data=request.data)
+        #serializer2.is_valid(raise_exception=True)
+        #serializer2.save()
 
         return Response(serializer.data, status=201)
 
