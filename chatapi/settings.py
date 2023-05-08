@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os.path
 from pathlib import Path
 from decouple import config
+import paralleldots
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -167,6 +168,9 @@ SOCKET_SERVER = config("SOCKET_SERVER")
 IAM_TOKEN = config("IAM_TOKEN")
 
 FOLDER_ID = config("FOLDER_ID")
+
+PARALLELDOTS_API_KEY = config("PARALLELDOTS_API_KEY")
+paralleldots.set_api_key(PARALLELDOTS_API_KEY)
 
 CSRF_TRUSTED_ORIGINS = ['https://animachat.ru/', 'https://api.animachat.ru/']
 

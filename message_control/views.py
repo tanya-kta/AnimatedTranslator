@@ -7,6 +7,22 @@ from django.db.models import Q
 from django.conf import settings
 import requests
 import json
+import paralleldots
+import operator
+
+
+def getEmotionGif(text):
+    emotions = paralleldots.emotion(text)["emotion"]
+    emotion = max(emotions.items(), key=operator.itemgetter(1))[0]
+    gifs = {
+        "Sad": "https://i.gifer.com/9k4y.gif",
+        "Excited": "https://i.gifer.com/IsIM.gif",
+        "Angry": "https://i.gifer.com/Odc2.gif",
+        "Bored": "https://i.gifer.com/cjv.gif",
+        "Fear": "https://i.gifer.com/513W.gif",
+        "Happy": "https://i.gifer.com/52qY.gif"
+    }
+    return gifs[emotion]
 
 
 def handleRequest(serializer):
@@ -61,19 +77,20 @@ class MessageView(ModelViewSet):
     def create(self, request, *args, **kwargs):
         if hasattr(request.data, '_mutable'):
             request.data._mutable = True
-        attachments = request.data.pop("attachments", None)
+        request.data.pop("attachments", None)
 
         if str(request.user.id) != str(request.data.get("sender_id", None)):
             raise Exception("Only sender can create a message")
 
-        #print(request.data)
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        request.data['message'] = "https://res.cloudinary.com/dhip0v8jx/image/upload/v1683574428/pug-dance_l55nty.gif"
-        serializer2 = self.serializer_class(data=request.data)
-        serializer2.is_valid(raise_exception=True)
-        serializer2.save()
+        
+        if request.data["message"][0:4] != "http":
+            request.data["message"] = getEmotionGif(request.data["message"])
+            serializer2 = self.serializer_class(data=request.data)
+            serializer2.is_valid(raise_exception=True)
+            serializer2.save()
 
         return Response(serializer.data, status=201)
 
