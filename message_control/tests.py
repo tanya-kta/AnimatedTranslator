@@ -126,5 +126,6 @@ class TestMessage(APITestCase):
         response = self.client.get(
             self.message_url+f"?user_id={self.receiver.id}", **self.bearer)
         result = response.json()
+        print(result)
 
         self.assertEqual(response.status_code, 200)
