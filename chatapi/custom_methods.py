@@ -45,7 +45,9 @@ def custom_exception_handler(exc, context):
 def translate_text(text, language):
     if language == "russian":
         language = "ru"
-    if language == "english":
+    elif language == "english":
+        language = "en"
+    else:
         language = "en"
 
     body = {
