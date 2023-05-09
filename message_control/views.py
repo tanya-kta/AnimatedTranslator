@@ -87,7 +87,7 @@ class MessageView(ModelViewSet):
         for item in response:
             if item["message"][0:4] != "http":
                 item["message"] = translate_text(item["message"], language)
-        print(response)
+        #print(response)
         return Response(response)
 
     def create(self, request, *args, **kwargs):
