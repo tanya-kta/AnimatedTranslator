@@ -65,7 +65,7 @@ class MessageView(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         from user_control.models import UserProfile
-        #language = UserProfile.objects.filter(user=self.request.user).distinct()[0].language
+        language = UserProfile.objects.filter(user=self.request.user).distinct()[0].language
 
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
