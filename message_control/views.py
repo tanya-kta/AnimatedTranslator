@@ -64,27 +64,24 @@ class MessageView(ModelViewSet):
         return self.queryset
 
     def list(self, request, *args, **kwargs):
-        from user_control.models import UserProfile, CustomUser
-        data = self.request.query_params.dict()
-        user_id = data.get("user_id", None)
-        user = CustomUser.objects.filter(id=user_id).distinct()[0]
-        language = UserProfile.objects.filter(user=user).distinct()[0].language
+        from user_control.models import UserProfile
+        #language = UserProfile.objects.filter(user=self.request.user).distinct()[0].language
 
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             result = serializer.data
-            for item in result:
-                if item["message"][0:4] != "http":
-                    item["message"] = translate_text(item["message"], language)
+            #for item in result:
+            #    if item["message"][0:4] != "http":
+            #        item["message"] = translate_text(item["message"], language)
             return self.get_paginated_response(result)
 
         serializer = self.get_serializer(queryset, many=True)
         result = serializer.data
-        for item in result:
-            if item["message"][0:4] != "http":
-                item["message"] = translate_text(item["message"], language)
+        #for item in result:
+        #    if item["message"][0:4] != "http":
+        #        item["message"] = translate_text(item["message"], language)
         return Response(result)
 
     def create(self, request, *args, **kwargs):
