@@ -51,6 +51,7 @@ class MessageView(ModelViewSet):
         .prefetch_related("message_attachments")
     serializer_class = MessageSerializer
     permission_classes = (IsAuthenticatedCustom, )
+    pagination_class = None
 
     def get_queryset(self):
         #from user_control.models import UserProfile, CustomUser
@@ -62,17 +63,32 @@ class MessageView(ModelViewSet):
             #user = CustomUser.objects.filter(id=user_id).distinct()[0]
             #language = UserProfile.objects.filter(user=user).distinct()[0].language
             #print(language)
-            translated_query = self.queryset.filter(
-                Q(sender_id=user_id, receiver_id=active_user_id) |
-                Q(sender_id=active_user_id, receiver_id=user_id)).distinct()
             #print(translated_query)
             #translated_query[0].message = translate_text(translated_query[0].message, language)["translations"][0]["text"]
             #print(translated_query[0] == self.queryset.filter(
             #    Q(sender_id=user_id, receiver_id=active_user_id) |
             #    Q(sender_id=active_user_id, receiver_id=user_id)).distinct()[0])
                
-            return translated_query
+            return self.queryset.filter(
+                Q(sender_id=user_id, receiver_id=active_user_id) |
+                Q(sender_id=active_user_id, receiver_id=user_id)).distinct()
         return self.queryset
+
+    def list(self, request, *args, **kwargs):
+        from user_control.models import UserProfile, CustomUser
+        data = self.request.query_params.dict()
+        user_id = data.get("user_id", None)
+        user = CustomUser.objects.filter(id=user_id).distinct()[0]
+        language = UserProfile.objects.filter(user=user).distinct()[0].language
+        print(language)
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        response = serializer.data
+        for item in response:
+            if item["message"][0:4] != "http":
+                item["message"] = translate_text(item["message"], language)
+        print(response)
+        return Response(response)
 
     def create(self, request, *args, **kwargs):
         if hasattr(request.data, '_mutable'):

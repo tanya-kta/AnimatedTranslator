@@ -64,6 +64,10 @@ class TestMessage(APITestCase):
             "receiver", "receiver123", email="tanya-kta@bk.ru")
         UserProfile.objects.create(
             first_name="receiver", last_name="receiver", user=self.receiver, language="russian")
+        self.receiver2 = CustomUser.objects._create_user(
+            "receiver2", "receiver2123", email="ricopin@bk.ru")
+        UserProfile.objects.create(
+            first_name="receiver2", last_name="receiver2", user=self.receiver2, language="russian")
     
     def test_post_message(self):
         payload = {
@@ -122,10 +126,17 @@ class TestMessage(APITestCase):
         }
         response = self.client.post(
             self.message_url, data=payload, **self.bearer)
-        
+        payload = {
+            "sender_id": self.sender.id,
+            "receiver_id": self.receiver2.id,
+            "message": "тестовое сообщение",
+        }
+        response = self.client.post(
+            self.message_url, data=payload, **self.bearer)
+
         response = self.client.get(
             self.message_url+f"?user_id={self.receiver.id}", **self.bearer)
         result = response.json()
-        print(result)
+        #print(result)
 
         self.assertEqual(response.status_code, 200)
