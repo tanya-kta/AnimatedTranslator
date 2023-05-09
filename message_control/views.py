@@ -64,7 +64,7 @@ class MessageView(ModelViewSet):
                 Q(sender_id=active_user_id, receiver_id=user_id)).distinct()
         return self.queryset
 
-    def list(self, request, *args, **kwargs):
+    """def list(self, request, *args, **kwargs):
         from user_control.models import UserProfile, CustomUser
         data = self.request.query_params.dict()
         user_id = data.get("user_id", None)
@@ -78,7 +78,17 @@ class MessageView(ModelViewSet):
             if item["message"][0:4] != "http":
                 item["message"] = translate_text(item["message"], language)
         #print(response)
-        return Response(response)
+        return Response(response)"""
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         if hasattr(request.data, '_mutable'):
