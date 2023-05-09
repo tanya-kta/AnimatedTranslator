@@ -54,21 +54,11 @@ class MessageView(ModelViewSet):
     pagination_class = None
 
     def get_queryset(self):
-        #from user_control.models import UserProfile, CustomUser
         data = self.request.query_params.dict()
         user_id = data.get("user_id", None)
 
         if user_id:
             active_user_id = self.request.user.id
-            #user = CustomUser.objects.filter(id=user_id).distinct()[0]
-            #language = UserProfile.objects.filter(user=user).distinct()[0].language
-            #print(language)
-            #print(translated_query)
-            #translated_query[0].message = translate_text(translated_query[0].message, language)["translations"][0]["text"]
-            #print(translated_query[0] == self.queryset.filter(
-            #    Q(sender_id=user_id, receiver_id=active_user_id) |
-            #    Q(sender_id=active_user_id, receiver_id=user_id)).distinct()[0])
-               
             return self.queryset.filter(
                 Q(sender_id=user_id, receiver_id=active_user_id) |
                 Q(sender_id=active_user_id, receiver_id=user_id)).distinct()
@@ -80,7 +70,7 @@ class MessageView(ModelViewSet):
         user_id = data.get("user_id", None)
         user = CustomUser.objects.filter(id=user_id).distinct()[0]
         language = UserProfile.objects.filter(user=user).distinct()[0].language
-        print(language)
+        #print(language)
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
         response = serializer.data
