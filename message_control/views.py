@@ -51,8 +51,7 @@ class MessageView(ModelViewSet):
         .prefetch_related("message_attachments")
     serializer_class = MessageSerializer
     permission_classes = (IsAuthenticatedCustom, )
-    pagination_class = None
-
+    
     def get_queryset(self):
         data = self.request.query_params.dict()
         user_id = data.get("user_id", None)
