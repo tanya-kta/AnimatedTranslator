@@ -66,6 +66,7 @@ class MessageView(ModelViewSet):
     def list(self, request, *args, **kwargs):
         from user_control.models import UserProfile
         language = UserProfile.objects.filter(user=self.request.user).distinct()[0].language
+        show_gif = UserProfile.objects.filter(user=self.request.user).distinct()[0].show_gif
 
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
@@ -75,6 +76,12 @@ class MessageView(ModelViewSet):
             for item in result:
                 if item["message"][0:4] != "http":
                     item["message"] = translate_text(item["message"], language)
+            if not show_gif:
+                no_gifs = []
+                for item in result:
+                    if item["message"][0:4] != "http":
+                        no_gifs.append(item)
+                result = no_gifs
             return self.get_paginated_response(result)
 
         serializer = self.get_serializer(queryset, many=True)
@@ -82,6 +89,12 @@ class MessageView(ModelViewSet):
         for item in result:
             if item["message"][0:4] != "http":
                 item["message"] = translate_text(item["message"], language)
+        if not show_gif:
+            no_gifs = []
+            for item in result:
+                if item["message"][0:4] != "http":
+                    no_gifs.append(item)
+            result = no_gifs
         return Response(result)
 
     def create(self, request, *args, **kwargs):
